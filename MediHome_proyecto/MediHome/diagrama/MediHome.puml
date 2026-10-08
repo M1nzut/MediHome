@@ -1,0 +1,88 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam backgroundColor white
+skinparam classBackgroundColor #D3EEFA
+skinparam classBorderColor #21618C
+left to right direction
+interface INotificable {
+  +notificar(mensaje: String): void
+}
+abstract class Usuario {
+  -identificacion: String
+  -nombre: String
+  -correo: String
+  +getIdentificacion(): String
+  +getNombre(): String
+  +getCorreo(): String
+  +notificar(mensaje: String): void
+}
+class Empresa {
+  -identificacion: String
+  -nombre: String
+  -correo: String
+  -telefono: String
+  -direccionPrincipal: String
+  +agregarEquipo(equipo: EquipoMedico): void
+}
+class EquipoMedico {
+  -codigo: String
+  -nombre: String
+  -zonaCobertura: String
+  +agregarProfesional(profesional: ProfesionalSalud): void
+  +quitarProfesional(profesional: ProfesionalSalud): void
+}
+class ProfesionalSalud {
+  -numeroRegistroProfesional: String
+  -especialidad: String
+  +getEspecialidad(): String
+}
+class Paciente {
+  -telefono: String
+  -direccion: String
+  +getTelefono(): String
+  +getDireccion(): String
+}
+enum EstadoServicio {
+  SOLICITADO
+  PROGRAMADO
+  EN_ATENCION
+  FINALIZADO
+  CANCELADO
+}
+class ServicioDomiciliario {
+  -codigoUnico: String
+  -fechaHora: LocalDateTime
+  -direccionAtencion: String
+  -motivo: String
+  -estado: EstadoServicio
+  +programar(profesional: ProfesionalSalud): void
+  +iniciarAtencion(inicio: LocalDateTime): AtencionMedica
+  +cancelar(): void
+}
+class AtencionMedica {
+  -fechaHoraInicio: LocalDateTime
+  -fechaHoraFinalizacion: LocalDateTime
+  -observaciones: String
+  -recomendaciones: String
+  +registrarMedicion(medicion: MedicionSignos): void
+  +finalizar(fin: LocalDateTime, observaciones: String, recomendaciones: String): void
+}
+class MedicionSignos {
+  -fechaHora: LocalDateTime
+  -temperatura: double
+  -frecuenciaCardiaca: int
+  -presionSistolica: int
+  -presionDiastolica: int
+  -saturacionOxigeno: double
+}
+Usuario ..|> INotificable
+Usuario <|-- ProfesionalSalud
+Usuario <|-- Paciente
+Empresa "1" o-- "0..*" EquipoMedico : organiza
+EquipoMedico "0..1" o-- "0..*" ProfesionalSalud : pertenece
+Paciente "1" -- "0..*" ServicioDomiciliario : solicita
+ProfesionalSalud "0..1" -- "0..*" ServicioDomiciliario : atiende
+ServicioDomiciliario "1" *-- "0..1" AtencionMedica : genera
+AtencionMedica "1" *-- "0..*" MedicionSignos : registra
+ServicioDomiciliario --> EstadoServicio
+@enduml
